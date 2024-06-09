@@ -1,0 +1,2 @@
+# siggy
+Statsig CLI
