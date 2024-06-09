@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import ConsoleApiHelper from "../utils/ConsoleApiHelper";
+import { EntityHelpers } from "../utils/EntityHelpers";
 import { checkPrereqs } from "../utils/checkPrereqs";
 import readline  from "readline/promises";
 import writeResponse from "../utils/writeResponse";
@@ -66,108 +67,16 @@ export default function experimentsCommand(program: Command) {
     });
 }
 
-const PATH_FRAG = 'experiments';
-
-abstract class ExperimentHelpers {
-  static async create(name: string) {
-    if (!checkPrereqs()) {
-      return -1;
-    }
-
-    const resp = await ConsoleApiHelper.post(
-      PATH_FRAG,
-      { name }
-    );
-    return writeResponse(resp);
-  }
-
-  static async get(id: string) {
-    if (!checkPrereqs()) {
-      return -1;
-    }
-
-    const resp = await ConsoleApiHelper.get(`${PATH_FRAG}/${id}`, {});
-    return writeResponse(resp);
-  }
-
-  static async list(options: any) {
-    if (!checkPrereqs()) {
-      return -1;
-    }
-
-    let page = options.page || 1;
-    let limit = 100;
-    const resp = await ConsoleApiHelper.get(PATH_FRAG, { page, limit });
-    if (!resp.ok) {
-      return writeResponse(resp);
-    }
-
-    const respObj = await resp.json();
-    let output = respObj;
-    if (respObj.data) {
-      output = respObj.data.map((item: any) => {
-        return {
-          id: item.id,
-          name: item.name,
-          lastModifiedTime: item.lastModifiedTime,
-          lastModifierName: item.lastModifierName,
-        };
-      });
-    }
-    console.log(output);
-    return 0;
-  }
-
-  static async update(id: string, properties: string) {
-    if (!checkPrereqs()) {
-      return -1;
-    }
-
-    let body = {};
-    try {
-      body = JSON.parse(properties);
-    } catch {
-      console.error('Invalid JSON');
-      return -1;
-    }
-
-    const resp = await ConsoleApiHelper.patch(
-      `${PATH_FRAG}/${id}`,
-      body,
-    );
-    return writeResponse(resp);
-  }
-
-  static async delete(id: string, options: any) {
-    if (!checkPrereqs()) {
-      return -1;
-    }
-
-    if (!options.force) {
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
-      const answer = await rl.question(
-        `Are you sure you want to delete experiment (id: ${id})? (y/n): `,
-      );
-      rl.close();
-      if (answer !== 'y') {
-        console.log('Aborted');
-        return 0;
-      }
-    }
-
-    const resp = await ConsoleApiHelper.delete(`${PATH_FRAG}/${id}`);
-    return writeResponse(resp);
-  }
+abstract class ExperimentHelpers extends EntityHelpers {
+  protected static pathFrag = 'experiments';
+  protected static entityType = 'experiment';
 
   static async start(id: string) {
     if (!checkPrereqs()) {
       return -1;
     }
 
-    const resp = await ConsoleApiHelper.put(`${PATH_FRAG}/${id}/start`);
+    const resp = await ConsoleApiHelper.put(`${this.pathFrag}/${id}/start`);
     return writeResponse(resp);
   }
 
@@ -176,7 +85,7 @@ abstract class ExperimentHelpers {
       return -1;
     }
 
-    const resp = await ConsoleApiHelper.put(`${PATH_FRAG}/${id}/reset`);
+    const resp = await ConsoleApiHelper.put(`${this.pathFrag}/${id}/reset`);
     return writeResponse(resp);
   }
 
@@ -185,7 +94,7 @@ abstract class ExperimentHelpers {
       return -1;
     }
 
-    const resp = await ConsoleApiHelper.put(`${PATH_FRAG}/${id}/abandon`);
+    const resp = await ConsoleApiHelper.put(`${this.pathFrag}/${id}/abandon`);
     return writeResponse(resp);
   }
 
@@ -203,7 +112,7 @@ abstract class ExperimentHelpers {
     }
 
     const resp = await ConsoleApiHelper.put(
-      `${PATH_FRAG}/${id}/make_decision`,
+      `${this.pathFrag}/${id}/make_decision`,
       body,
     );
     return writeResponse(resp);
