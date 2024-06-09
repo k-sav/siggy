@@ -1,0 +1,23 @@
+{
+  "name": "siggy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/app.js",
+  "bin": "dist/app.js",
+  "preferGlobal": true,
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node dist/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "typescript": "^5.4.5"
+  }
+}
