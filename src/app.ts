@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 import { Command } from "commander";
 import configCommand from "./config/configCommand";
 import dynconCommand from "./dyncon/dynconCommand";

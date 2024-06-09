@@ -1,5 +1,8 @@
+import ClientApiHelper from "../utils/ClientApiHelper";
 import { Command } from "commander";
 import { EntityHelpers } from "../utils/EntityHelpers";
+import { checkClientApiPrereqs } from "../utils/checkPrereqs";
+import writeResponse from "../utils/writeResponse";
 
 export default function dynconCommand(program: Command) {
   const topCommand = program.command('dyncon')
@@ -37,9 +40,37 @@ export default function dynconCommand(program: Command) {
     .action(async (id: string, options) => {
       DynamicConfigHelpers.delete(id, options);
     });
+
+  topCommand
+    .command('get-value <dynamic-config-id>')
+    .description('retrieve the value of a dynamic config')
+    .option('-u, --user <user-object-json>', 'user object json')
+    .action(async (id: string, options) => {
+      DynamicConfigHelpers.getValue(id, options);
+    });
 }
 
 abstract class DynamicConfigHelpers extends EntityHelpers {
   protected static pathFrag = 'dynamic_configs';
   protected static entityType = 'dynamic config';
+
+  public static async getValue(id: string, options: any) {
+    if (!checkClientApiPrereqs()) {
+      return -1;
+    }
+
+    let user = {};
+    try {
+      user = JSON.parse(options.user || '{}');
+    } catch {
+      console.error('Invalid JSON');
+      return -1;
+    }
+
+    const resp = await ClientApiHelper.post(`get_config`, {
+      user,
+      configName: id,
+    });
+    return writeResponse(resp);
+  }
 }

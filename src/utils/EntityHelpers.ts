@@ -1,5 +1,5 @@
 import ConsoleApiHelper from "./ConsoleApiHelper";
-import { checkPrereqs } from "./checkPrereqs";
+import { checkConsoleApiPrereqs } from "./checkPrereqs";
 import readline from 'readline/promises';
 import writeResponse from "./writeResponse";
 
@@ -7,7 +7,7 @@ export abstract class EntityHelpers {
   protected static pathFrag: string = 'not-set';
   protected static entityType: string = 'not-set';
   static async create(name: string) {
-    if (!checkPrereqs()) {
+    if (!checkConsoleApiPrereqs()) {
       return -1;
     }
 
@@ -19,7 +19,7 @@ export abstract class EntityHelpers {
   }
 
   static async get(id: string) {
-    if (!checkPrereqs()) {
+    if (!checkConsoleApiPrereqs()) {
       return -1;
     }
 
@@ -28,7 +28,7 @@ export abstract class EntityHelpers {
   }
 
   static async list(options: any) {
-    if (!checkPrereqs()) {
+    if (!checkConsoleApiPrereqs()) {
       return -1;
     }
 
@@ -56,7 +56,7 @@ export abstract class EntityHelpers {
   }
 
   static async update(id: string, properties: string) {
-    if (!checkPrereqs()) {
+    if (!checkConsoleApiPrereqs()) {
       return -1;
     }
 
@@ -76,7 +76,7 @@ export abstract class EntityHelpers {
   }
 
   static async delete(id: string, options: any) {
-    if (!checkPrereqs()) {
+    if (!checkConsoleApiPrereqs()) {
       return -1;
     }
 

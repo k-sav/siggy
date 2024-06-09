@@ -2,8 +2,10 @@
   "name": "siggy",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
-  "bin": "dist/app.js",
+  "main": "./dist/app.js",
+  "bin": {
+    "statsig": "./dist/app.js"
+  },
   "preferGlobal": true,
   "scripts": {
     "build": "tsc",

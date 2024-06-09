@@ -1,8 +1,9 @@
+import { checkClientApiPrereqs, checkConsoleApiPrereqs } from "../utils/checkPrereqs";
+
+import ClientApiHelper from "../utils/ClientApiHelper";
 import { Command } from "commander";
 import ConsoleApiHelper from "../utils/ConsoleApiHelper";
 import { EntityHelpers } from "../utils/EntityHelpers";
-import { checkPrereqs } from "../utils/checkPrereqs";
-import readline  from "readline/promises";
 import writeResponse from "../utils/writeResponse";
 
 export default function experimentsCommand(program: Command) {
@@ -65,6 +66,14 @@ export default function experimentsCommand(program: Command) {
     .action(async (id: string, props: string) => {
       ExperimentHelpers.ship(id, props);
     });
+
+  topCommand
+    .command('get-value <experiment-id>')
+    .description('retrieve the value of the experiment variant for a user')
+    .option('-u, --user <user-object-json>', 'user object json')
+    .action(async (id: string, options) => {
+      ExperimentHelpers.getValue(id, options);
+    });
 }
 
 abstract class ExperimentHelpers extends EntityHelpers {
@@ -72,7 +81,7 @@ abstract class ExperimentHelpers extends EntityHelpers {
   protected static entityType = 'experiment';
 
   static async start(id: string) {
-    if (!checkPrereqs()) {
+    if (!checkConsoleApiPrereqs()) {
       return -1;
     }
 
@@ -81,7 +90,7 @@ abstract class ExperimentHelpers extends EntityHelpers {
   }
 
   static async reset(id: string) {
-    if (!checkPrereqs()) {
+    if (!checkConsoleApiPrereqs()) {
       return -1;
     }
 
@@ -90,7 +99,7 @@ abstract class ExperimentHelpers extends EntityHelpers {
   }
 
   static async abandon(id: string) {
-    if (!checkPrereqs()) {
+    if (!checkConsoleApiPrereqs()) {
       return -1;
     }
 
@@ -99,7 +108,7 @@ abstract class ExperimentHelpers extends EntityHelpers {
   }
 
   static async ship(id: string, props: string) {
-    if (!checkPrereqs()) {
+    if (!checkConsoleApiPrereqs()) {
       return -1;
     }
 
@@ -115,6 +124,26 @@ abstract class ExperimentHelpers extends EntityHelpers {
       `${this.pathFrag}/${id}/make_decision`,
       body,
     );
+    return writeResponse(resp);
+  }
+
+  public static async getValue(id: string, options: any) {
+    if (!checkClientApiPrereqs()) {
+      return -1;
+    }
+
+    let user = {};
+    try {
+      user = JSON.parse(options.user || '{}');
+    } catch {
+      console.error('Invalid JSON');
+      return -1;
+    }
+
+    const resp = await ClientApiHelper.post(`get_config`, {
+      user,
+      configName: id,
+    });
     return writeResponse(resp);
   }
 }

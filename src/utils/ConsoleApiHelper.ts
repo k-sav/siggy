@@ -7,7 +7,7 @@ export default class ConsoleApiHelper {
 
   public static getKey() {
     if (!this.apiKey) {
-      this.apiKey = getNetRcKey('apikey');
+      this.apiKey = getNetRcKey('consolekey');
     }
     return this.apiKey;
   }
@@ -61,7 +61,7 @@ export default class ConsoleApiHelper {
   static async issueRequest(method: string, url: string, body: any) {
     const key = this.getKey();
     if (!key) {
-      throw new Error('API key not set. Please run `statsig config -k <console-api-key>` to set your API key.');
+      throw new Error('API key not set. Please run `statsig config -c <console-api-key>`.');
     }
 
     const headers = {

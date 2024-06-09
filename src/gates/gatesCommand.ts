@@ -1,5 +1,8 @@
+import ClientApiHelper from "../utils/ClientApiHelper";
 import { Command } from "commander";
 import { EntityHelpers } from "../utils/EntityHelpers";
+import { checkClientApiPrereqs } from "../utils/checkPrereqs";
+import writeResponse from "../utils/writeResponse";
 
 export default function gatesCommand(program: Command) {
   const topCommand = program.command('gates')
@@ -32,14 +35,42 @@ export default function gatesCommand(program: Command) {
     });
   topCommand
     .command('delete <gate-id>')
-    .option('-f, --force', 'do not prompt for confirmation')
     .description('delete a gate')
+    .option('-f, --force', 'do not prompt for confirmation')
     .action(async (id: string, options) => {
       GateHelpers.delete(id, options);
+    });
+
+  topCommand
+    .command('check <gate-id>')
+    .description('check if the current state of the gate for a user')
+    .option('-u, --user <user-object-json>', 'user object json')
+    .action(async (id: string, options) => {
+      GateHelpers.check(id, options);
     });
 }
 
 abstract class GateHelpers extends EntityHelpers {
   protected static pathFrag = 'gates';
   protected static entityType = 'gate';
+
+  public static async check(id: string, options: any) {
+    if (!checkClientApiPrereqs()) {
+      return -1;
+    }
+
+    let user = {};
+    try {
+      user = JSON.parse(options.user || '{}');
+    } catch {
+      console.error('Invalid JSON');
+      return -1;
+    }
+
+    const resp = await ClientApiHelper.post(`check_gate`, {
+      user,
+      gateName: id,
+    });
+    return writeResponse(resp);
+  }
 }
