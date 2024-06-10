@@ -1,6 +1,6 @@
 {
-  "name": "siggy",
-  "version": "0.1",
+  "name": "@statsig/siggy",
+  "version": "0.0.1",
   "description": "",
   "main": "./dist/app.js",
   "bin": {
