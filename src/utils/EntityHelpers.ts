@@ -51,7 +51,7 @@ export abstract class EntityHelpers {
         };
       });
     }
-    console.log(output);
+    console.log(JSON.stringify(output, null, 2));
     return 0;
   }
 

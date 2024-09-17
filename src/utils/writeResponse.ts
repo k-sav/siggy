@@ -1,3 +1,4 @@
+import { program } from "commander";
 
 export default async function writeResponse(response: Response) {
   if (!response.ok) {
@@ -23,11 +24,11 @@ export default async function writeResponse(response: Response) {
 
   const responseObj = await response.json();
   if (responseObj.data) {
-    console.dir(responseObj.data, { depth: 10 });
+    console.log(JSON.stringify(responseObj.data, null, 2));
   } else if (responseObj.message) {
     console.log(responseObj.message);
   } else {
-    console.dir(responseObj, { depth: 10 });
+    console.log(JSON.stringify(responseObj, null, 2));
   }
   return 0;
 }
