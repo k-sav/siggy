@@ -5,6 +5,7 @@ import configCommand from "./config/configCommand";
 import dynconCommand from "./dyncon/dynconCommand";
 import experimentsCommand from "./experiments/experimentsCommand";
 import gatesCommand from "./gates/gatesCommand";
+import logsCommand from "./logs/logsCommand";
 import segmentsCommand from "./segments/segmentsCommand";
 
 function main() {
@@ -22,6 +23,7 @@ For information on schema, see https://docs.statsig.com/console-api/introduction
   dynconCommand(program);
   segmentsCommand(program);
   experimentsCommand(program);
+  logsCommand(program);
   program.parse();
 }
 
