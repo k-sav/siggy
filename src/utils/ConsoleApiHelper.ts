@@ -61,7 +61,9 @@ export default class ConsoleApiHelper {
   static async issueRequest(method: string, url: string, body: any) {
     const key = this.getKey();
     if (!key) {
-      throw new Error('API key not set. Please run `statsig config -c <console-api-key>`.');
+      throw new Error(
+        'API key not set. Run `siggy config -c <console-api-key>` or set SIGGY_CONSOLE_API_KEY.',
+      );
     }
 
     const headers = {

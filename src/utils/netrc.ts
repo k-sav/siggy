@@ -1,7 +1,18 @@
 import fs from 'fs';
 import { join } from 'path';
 
-export function getNetRcKey(key) {
+const ENV_KEYS: Record<string, string[]> = {
+  consolekey: ['SIGGY_CONSOLE_API_KEY', 'STATSIG_CONSOLE_API_KEY'],
+  clientkey: ['SIGGY_CLIENT_API_KEY'],
+};
+
+export function getNetRcKey(key: string): string | undefined {
+  for (const envName of ENV_KEYS[key] ?? []) {
+    const fromEnv = process.env[envName];
+    if (fromEnv) {
+      return fromEnv;
+    }
+  }
   const netrc = parseNetrc();
   const sc = netrc['statsig.com'] || {};
   return sc[key];
