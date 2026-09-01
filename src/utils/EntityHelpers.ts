@@ -32,31 +32,61 @@ export abstract class EntityHelpers {
       return -1;
     }
 
-    let page = options.page || 1;
-    let limit = 100;
-    const resp = await ConsoleApiHelper.get(this.pathFrag, { page, limit });
-    if (!resp.ok) {
-      return writeResponse(resp);
+    const limit = 100;
+    // Fetch every page when --all is set, or when any filter is given (a
+    // per-page filter is rarely what the caller wants).
+    const fetchAll = options.all || options.status != null || options.type != null || options.staleDays != null;
+
+    let data: any[];
+    if (fetchAll) {
+      data = [];
+      const maxPages = 200;
+      for (let page = 1; page <= maxPages; page++) {
+        const resp = await ConsoleApiHelper.get(this.pathFrag, { page, limit });
+        if (!resp.ok) {
+          return writeResponse(resp);
+        }
+        const batch = (await resp.json()).data || [];
+        data = data.concat(batch);
+        if (batch.length < limit) {
+          break;
+        }
+      }
+    } else {
+      const page = options.page || 1;
+      const resp = await ConsoleApiHelper.get(this.pathFrag, { page, limit });
+      if (!resp.ok) {
+        return writeResponse(resp);
+      }
+      const respObj = await resp.json();
+      if (!respObj.data) {
+        console.log(JSON.stringify(respObj, null, 2));
+        return 0;
+      }
+      data = respObj.data;
     }
 
-    const respObj = await resp.json();
-    let output = respObj;
-    if (respObj.data) {
-      let data = respObj.data;
-      if (options.status) {
-        data = data.filter((item: any) => item.status === options.status);
-      }
-      output = data.map((item: any) => {
-        return {
-          id: item.id,
-          name: item.name,
-          status: item.status,
-          isStale: item.isStale,
-          lastModifiedTime: item.lastModifiedTime,
-          lastModifierName: item.lastModifierName,
-        };
-      });
+    if (options.status) {
+      data = data.filter((item: any) => item.status === options.status);
     }
+    if (options.type) {
+      data = data.filter((item: any) => item.type === options.type);
+    }
+    if (options.staleDays) {
+      const cutoff = Date.now() - Number(options.staleDays) * 24 * 60 * 60 * 1000;
+      data = data.filter((item: any) => item.lastModifiedTime != null && item.lastModifiedTime < cutoff);
+    }
+    const output = data.map((item: any) => {
+      return {
+        id: item.id,
+        name: item.name,
+        status: item.status,
+        type: item.type,
+        isStale: item.isStale,
+        lastModifiedTime: item.lastModifiedTime,
+        lastModifierName: item.lastModifierName,
+      };
+    });
     console.log(JSON.stringify(output, null, 2));
     return 0;
   }

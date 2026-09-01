@@ -25,7 +25,10 @@ export default function gatesCommand(program: Command) {
     .command('list')
     .description('list all gates')
     .option('-p, --page <page-number>', 'page number (use this for pagination)')
-    .option('-s, --status <status>', 'filter by status (e.g. In Progress, Launched, Disabled, Archived)')
+    .option('-a, --all', 'fetch all pages (auto-enabled when a filter is set)')
+    .option('-s, --status <status>', 'filter by status across all pages (e.g. In Progress, Launched, Disabled, Archived)')
+    .option('-t, --type <type>', 'filter by type across all pages (TEMPORARY, PERMANENT, STALE)')
+    .option('--stale-days <days>', 'only gates not modified in the last <days> days')
     .action(async (options) => {
       await GateHelpers.list(options);
     });

@@ -26,7 +26,9 @@ export default function experimentsCommand(program: Command) {
     .command('list')
     .description('list all experiments')
     .option('-p, --page <page-number>', 'page number (use this for pagination)')
-    .option('-s, --status <status>', 'filter by status (e.g. active, decision_made, experiment_stopped, abandoned, setup, archived)')
+    .option('-a, --all', 'fetch all pages (auto-enabled when a filter is set)')
+    .option('-s, --status <status>', 'filter by status across all pages (e.g. active, decision_made, experiment_stopped, abandoned, setup, archived)')
+    .option('--stale-days <days>', 'only experiments not modified in the last <days> days')
     .action(async (options) => {
       await ExperimentHelpers.list(options);
     });

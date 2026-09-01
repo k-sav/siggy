@@ -24,7 +24,8 @@ export default function dynconCommand(program: Command) {
     .command('list')
     .description('list all dynamic configs')
     .option('-p, --page <page-number>', 'page number (use this for pagination)')
-    .option('-s, --status <status>', 'filter by status (e.g. Enabled, Disabled, Archived)')
+    .option('-a, --all', 'fetch all pages (auto-enabled when --status is set)')
+    .option('-s, --status <status>', 'filter by status across all pages (e.g. Enabled, Disabled, Archived)')
     .action(async (options) => {
       await DynamicConfigHelpers.list(options);
     });
