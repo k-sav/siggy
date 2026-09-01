@@ -8,7 +8,7 @@ import writeResponse from "../utils/writeResponse";
 
 export default function experimentsCommand(program: Command) {
   const topCommand = program.command('experiments')
-    .description('create/list/edit experiments');
+    .description('create/list/edit/archive experiments');
 
   topCommand
     .command('create <experiment-name>')
@@ -26,6 +26,7 @@ export default function experimentsCommand(program: Command) {
     .command('list')
     .description('list all experiments')
     .option('-p, --page <page-number>', 'page number (use this for pagination)')
+    .option('-s, --status <status>', 'filter by status (e.g. active, decision_made, experiment_stopped, abandoned, setup, archived)')
     .action(async (options) => {
       await ExperimentHelpers.list(options);
     });
@@ -41,6 +42,12 @@ export default function experimentsCommand(program: Command) {
     .description('delete an experiment')
     .action(async (id: string, options) => {
       ExperimentHelpers.delete(id, options);
+    });
+  topCommand
+    .command('archive <experiment-id>')
+    .description('archive an experiment')
+    .action(async (id: string) => {
+      ExperimentHelpers.archive(id);
     });
   topCommand
     .command('start <experiment-id>')

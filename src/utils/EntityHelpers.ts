@@ -42,10 +42,16 @@ export abstract class EntityHelpers {
     const respObj = await resp.json();
     let output = respObj;
     if (respObj.data) {
-      output = respObj.data.map((item: any) => {
+      let data = respObj.data;
+      if (options.status) {
+        data = data.filter((item: any) => item.status === options.status);
+      }
+      output = data.map((item: any) => {
         return {
           id: item.id,
           name: item.name,
+          status: item.status,
+          isStale: item.isStale,
           lastModifiedTime: item.lastModifiedTime,
           lastModifierName: item.lastModifierName,
         };
@@ -96,6 +102,15 @@ export abstract class EntityHelpers {
     }
 
     const resp = await ConsoleApiHelper.delete(`${this.pathFrag}/${id}`);
+    return writeResponse(resp);
+  }
+
+  static async archive(id: string) {
+    if (!checkConsoleApiPrereqs()) {
+      return -1;
+    }
+
+    const resp = await ConsoleApiHelper.put(`${this.pathFrag}/${id}/archive`);
     return writeResponse(resp);
   }
 }

@@ -1,12 +1,13 @@
 import ClientApiHelper from "../utils/ClientApiHelper";
 import { Command } from "commander";
+import ConsoleApiHelper from "../utils/ConsoleApiHelper";
 import { EntityHelpers } from "../utils/EntityHelpers";
-import { checkClientApiPrereqs } from "../utils/checkPrereqs";
+import { checkClientApiPrereqs, checkConsoleApiPrereqs } from "../utils/checkPrereqs";
 import writeResponse from "../utils/writeResponse";
 
 export default function gatesCommand(program: Command) {
   const topCommand = program.command('gates')
-    .description('create/list/edit gates');
+    .description('create/list/edit/archive gates');
 
   topCommand
     .command('create <gate-name>')
@@ -24,6 +25,7 @@ export default function gatesCommand(program: Command) {
     .command('list')
     .description('list all gates')
     .option('-p, --page <page-number>', 'page number (use this for pagination)')
+    .option('-s, --status <status>', 'filter by status (e.g. In Progress, Launched, Disabled, Archived)')
     .action(async (options) => {
       await GateHelpers.list(options);
     });
@@ -40,6 +42,18 @@ export default function gatesCommand(program: Command) {
     .action(async (id: string, options) => {
       GateHelpers.delete(id, options);
     });
+  topCommand
+    .command('archive <gate-id>')
+    .description('archive a gate')
+    .action(async (id: string) => {
+      GateHelpers.archive(id);
+    });
+  topCommand
+    .command('cleanup <gate-id>')
+    .description('start a code cleanup (generates a removal PR via the connected repo integration)')
+    .action(async (id: string) => {
+      GateHelpers.cleanup(id);
+    });
 
   topCommand
     .command('check <gate-id>')
@@ -53,6 +67,15 @@ export default function gatesCommand(program: Command) {
 abstract class GateHelpers extends EntityHelpers {
   protected static pathFrag = 'gates';
   protected static entityType = 'gate';
+
+  static async cleanup(id: string) {
+    if (!checkConsoleApiPrereqs()) {
+      return -1;
+    }
+
+    const resp = await ConsoleApiHelper.post(`${this.pathFrag}/${id}/code_cleanup`, {});
+    return writeResponse(resp);
+  }
 
   public static async check(id: string, options: any) {
     if (!checkClientApiPrereqs()) {

@@ -6,7 +6,7 @@ import writeResponse from "../utils/writeResponse";
 
 export default function dynconCommand(program: Command) {
   const topCommand = program.command('dyncon')
-    .description('create/list/edit dynamic configs');
+    .description('create/list/edit/archive dynamic configs');
 
   topCommand
     .command('create <dynamic-config-name>')
@@ -24,6 +24,7 @@ export default function dynconCommand(program: Command) {
     .command('list')
     .description('list all dynamic configs')
     .option('-p, --page <page-number>', 'page number (use this for pagination)')
+    .option('-s, --status <status>', 'filter by status (e.g. Enabled, Disabled, Archived)')
     .action(async (options) => {
       await DynamicConfigHelpers.list(options);
     });
@@ -39,6 +40,12 @@ export default function dynconCommand(program: Command) {
     .description('delete a dynamic config')
     .action(async (id: string, options) => {
       DynamicConfigHelpers.delete(id, options);
+    });
+  topCommand
+    .command('archive <dynamic-config-id>')
+    .description('archive a dynamic config')
+    .action(async (id: string) => {
+      DynamicConfigHelpers.archive(id);
     });
 
   topCommand
