@@ -65,9 +65,10 @@ export default function experimentsCommand(program: Command) {
     });
   topCommand
     .command('abandon <experiment-id>')
-    .description('abandon an experiment')
-    .action(async (id: string) => {
-      ExperimentHelpers.abandon(id);
+    .description('abandon an experiment (records an abandon decision)')
+    .option('-r, --reason <reason>', 'decision reason (required by the API)', 'Abandoned via siggy')
+    .action(async (id: string, options) => {
+      ExperimentHelpers.abandon(id, options);
     });
   topCommand
     .command('ship <experiment-id> <ship-properties-json>')
@@ -107,12 +108,14 @@ abstract class ExperimentHelpers extends EntityHelpers {
     return writeResponse(resp);
   }
 
-  static async abandon(id: string) {
+  static async abandon(id: string, options: any) {
     if (!checkConsoleApiPrereqs()) {
       return -1;
     }
 
-    const resp = await ConsoleApiHelper.put(`${this.pathFrag}/${id}/abandon`);
+    const resp = await ConsoleApiHelper.put(`${this.pathFrag}/${id}/abandon`, {
+      decisionReason: options?.reason ?? 'Abandoned via siggy',
+    });
     return writeResponse(resp);
   }
 
